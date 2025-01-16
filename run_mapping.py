@@ -4,6 +4,7 @@ import importlib.util
 import sys
 import argparse
 
+
 def run_mapping(aim_data, mapping_script_path, mapping_function_name):
     """
     Executes the mapping function on the provided AIM data.
@@ -58,6 +59,7 @@ def run_mapping(aim_data, mapping_script_path, mapping_function_name):
 
     return comp
 
+
 def run_from_command_line():
     """
     Executes the mapping function using command-line arguments.
@@ -94,11 +96,14 @@ def run_from_command_line():
 
     # Run the mapping
     try:
-        comp = run_mapping(aim_data, args.mapping_script_path, args.mapping_function_name)
+        comp = run_mapping(
+            aim_data, args.mapping_script_path, args.mapping_function_name
+        )
         print("Component Assignment:")
         print(comp)
     except (FileNotFoundError, ImportError, ValueError) as e:
         print(e)
+
 
 if __name__ == "__main__":
     run_from_command_line()
