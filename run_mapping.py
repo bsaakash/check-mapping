@@ -90,8 +90,7 @@ def main():
     try:
         gi, dl_ap, comp = mapping_function(aim_data)
     except ValueError as e:
-        print(f"Error during {mapping_function_name} execution:\n{e}")
-        return
+        raise ValueError(f"Error during {mapping_function_name} execution.") from e
 
     # Display the comp DataFrame
     print("Component Assignment:")
