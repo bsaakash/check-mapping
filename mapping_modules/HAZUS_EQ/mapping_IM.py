@@ -119,7 +119,7 @@ def auto_populate(aim):
     ).T
 
     # if needed, add components to simulate damage from ground failure
-    if gi["GroundFailure"]:
+    if gi.get("GroundFailure"):
 
         foundation_type_map = {
             'Shallow': 'S',
