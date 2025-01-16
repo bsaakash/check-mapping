@@ -35,12 +35,14 @@
 #
 # Contributors:
 # Adam Zsarnóczay
+# Aakash Bangalore Satish
 
 import json
-import pathlib
+from pathlib import Path
 
 import jsonschema
 from jsonschema import validate
+import pandas as pd
 
 def auto_populate(aim):
     """
