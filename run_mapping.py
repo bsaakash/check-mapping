@@ -1,3 +1,40 @@
+"""
+This module provides utilities to execute a specified mapping function on AIM data.
+
+The module contains two primary functions:
+1. `run_mapping`: Executes a mapping function on AIM data provided as a Python dictionary.
+2. `run_from_command_line`: A command-line interface to execute the mapping function using an AIM JSON file.
+
+Features:
+- Dynamically imports a specified mapping script and function.
+- Validates the provided AIM data.
+- Displays the resulting component assignment as a pandas DataFrame.
+
+Usage:
+    Command-Line:
+        python run_mapping.py <AIM_file_path> <mapping_script_path> <mapping_function_name>
+    Programmatic:
+        from this_module import run_mapping
+        comp = run_mapping(aim_data, mapping_script_path, mapping_function_name)
+
+Example:
+    Command-Line:
+        python run_mapping.py AIM.json /path/to/mapping_IM.py mapping
+    Programmatic:
+        comp = run_mapping(aim_data, '/path/to/mapping_IM.py', 'mapping')
+
+Requirements:
+    - The mapping script must be a valid Python file.
+    - The mapping function must accept a dictionary as input and return gi, dl_ap, and comp.
+    - The AIM data must conform to the expected schema.
+
+Exceptions:
+    - Raises FileNotFoundError if the mapping script is not found.
+    - Raises ImportError if the script or function cannot be imported.
+    - Raises ValueError for validation or execution errors.
+
+"""
+
 import json
 from pathlib import Path
 import importlib.util
