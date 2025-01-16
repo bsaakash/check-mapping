@@ -36,9 +36,7 @@ def main():
         "mapping_script_path", type=str, help="Full path to the mapping script."
     )
     parser.add_argument(
-        "mapping_function_name",
-        type=str,
-        help="Name of the mapping function to call.",
+        "mapping_function_name", type=str, help="Name of the mapping function to call."
     )
 
     # Parse arguments
@@ -66,10 +64,12 @@ def main():
         spec = importlib.util.spec_from_file_location(
             "mapping_module", str(mapping_script_path)
         )
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load spec from {mapping_script_path}")
         mapping_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mapping_module)
         mapping_function = getattr(mapping_module, mapping_function_name)
-    except ModuleNotFoundError as e:
+    except ImportError as e:
         print(f"Error: Failed to import module from '{mapping_script_path}'.\n{e}")
         return
     except AttributeError as e:
