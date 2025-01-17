@@ -3,20 +3,36 @@ from json_schema_combinator import generate_combinations, extract_types_and_valu
 import json
 from multiprocessing import Pool
 import traceback
+from jsonschema import validate
+import jsonschema.exceptions
 
 def run_combination(args):
     """
     Helper function to run a mapping for a single combination.
     """
-    aim_data, mapping_script, mapping_function = args
+    aim_data, mapping_script, mapping_function, input_schema = args
     try:
-        # Run the mapping function with the aim_data
+        # Validate the provided features against the required inputs
+        gi = aim_data['GeneralInformation']
+        try:
+            validate(instance=gi, schema=input_schema)
+        except jsonschema.exceptions.ValidationError as exc:
+            msg = ('The provided building information does not conform to the input'
+                   ' requirements for the chosen damage and loss model.')
+            return {
+                'status': 'invalid',
+                'combination': gi,
+                'error': msg,
+                'traceback': traceback.format_exc()
+            }
+
+        # Run the mapping function with the validated aim_data
         comp = run_mapping(aim_data, mapping_script, mapping_function)
 
         # Extract the model_id from the index of the comp DataFrame
         model_id = comp.index[0] if not comp.empty else None
 
-        return {'status': 'valid', 'combination': aim_data['GeneralInformation'], 'model_id': model_id}
+        return {'status': 'valid', 'combination': gi, 'model_id': model_id}
     except Exception as e:
         return {
             'status': 'invalid',
@@ -47,7 +63,7 @@ def process_combinations(mapping_script, mapping_function, json_schema):
 
     # Prepare multiprocessing inputs with aim_data structure
     inputs = [
-        ({"GeneralInformation": combination}, mapping_script, mapping_function)
+        ({"GeneralInformation": combination}, mapping_script, mapping_function, json_schema)
         for combination in combinations
     ]
 
@@ -84,15 +100,6 @@ if __name__ == "__main__":
     with open("mapping_modules/HAZUS_EQ/input_schema.json", "r") as schema_file:
         json_schema = json.load(schema_file)
     results = process_combinations(mapping_script, mapping_function, json_schema)
-
-    # # Print valid and invalid results
-    # print("Valid combinations:")
-    # for valid in results['valid']:
-    #     print(valid)
-
-    # print("\nInvalid combinations:")
-    # for invalid in results['invalid']:
-    #     print(invalid)
 
     # Summary
     total_combinations = len(results['valid']) + len(results['invalid'])
