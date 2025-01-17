@@ -1,5 +1,5 @@
 """
-Module: mapping_combinations
+Module: schema_mapping_validator.py
 
 This module facilitates validating and mapping all possible combinations of input data
 derived from a JSON schema. It uses multiprocessing to parallelize the analysis and outputs
@@ -40,7 +40,7 @@ def run_combination(args):
         gi = aim_data['GeneralInformation']
         try:
             validate(instance=gi, schema=input_schema)
-        except jsonschema.exceptions.ValidationError as exc:
+        except jsonschema.exceptions.ValidationError:
             msg = ('The provided building information does not conform to the input'
                    ' requirements for the chosen damage and loss model.')
             return {
