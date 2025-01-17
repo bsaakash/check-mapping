@@ -102,14 +102,14 @@ def extract_types_and_values(schema):
 
         if "enum" in details:  # For enumerated values
             values = details["enum"]
-        elif prop_type == "number" or prop_type == "integer":
-            if "minimum" in details and "maximum" in details:
-                # Generate a range of values (example: step of 1 for simplicity)
-                values = list(range(details["minimum"], details["maximum"] + 1))
-            elif "minimum" in details:
-                values = [details["minimum"]]
-            elif "maximum" in details:
-                values = [details["maximum"]]
+        # elif prop_type == "number" or prop_type == "integer":
+        #     if "minimum" in details and "maximum" in details:
+        #         # Generate a range of values (example: step of 1 for simplicity)
+        #         values = list(range(details["minimum"], details["maximum"] + 1))
+        #     elif "minimum" in details:
+        #         values = [details["minimum"]]
+        #     elif "maximum" in details:
+        #         values = [details["maximum"]]
         elif prop_type == "string":
             if "enum" in details:
                 values = details["enum"]
