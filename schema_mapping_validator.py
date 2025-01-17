@@ -1,6 +1,30 @@
+"""
+Module: mapping_combinations
+
+This module facilitates validating and mapping all possible combinations of input data
+derived from a JSON schema. It uses multiprocessing to parallelize the analysis and outputs
+a summary of valid and invalid combinations.
+
+Key Functions:
+- run_combination: Validates and maps a single combination of input data.
+- process_combinations: Orchestrates the validation and mapping for all combinations
+generated from a given JSON schema.
+
+Features:
+- JSON schema validation using `jsonschema`.
+- Parallel processing with Python's `multiprocessing`.
+- Detailed tracking of valid and invalid combinations, including errors and tracebacks.
+- Saves results to JSON files for further analysis.
+
+Example Usage:
+    Run the module as a script to process a mapping script and JSON schema:
+    python mapping_combinations.py
+"""
+
 from run_mapping import run_mapping
 from json_schema_combinator import generate_combinations, extract_types_and_values
 import json
+import time
 from multiprocessing import Pool
 import traceback
 from jsonschema import validate
@@ -97,12 +121,16 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
     return results
 
 if __name__ == "__main__":
+    import time
+
     # Example usage
     mapping_script = "mapping_modules/HAZUS_EQ/mapping_IM.py"
     mapping_function = "auto_populate"
     json_schema_file = "mapping_modules/HAZUS_EQ/input_schema.json"
 
+    start_time = time.time()
     results = process_combinations(mapping_script, mapping_function, json_schema_file)
+    elapsed_time = time.time() - start_time
 
     # Summary
     total_combinations = len(results['valid']) + len(results['invalid'])
@@ -110,6 +138,7 @@ if __name__ == "__main__":
     print(f"Total combinations: {total_combinations}")
     print(f"Valid combinations: {len(results['valid'])}")
     print(f"Invalid combinations: {len(results['invalid'])}")
+    print(f"Time taken: {elapsed_time:.2f} seconds")
 
     # Save results to JSON
     with open("valid_combinations.json", "w") as valid_file:
