@@ -41,20 +41,24 @@ def run_combination(args):
             'traceback': traceback.format_exc()
         }
 
-def process_combinations(mapping_script, mapping_function, json_schema):
+def process_combinations(mapping_script, mapping_function, json_schema_file):
     """
     Runs the mapping function for every combination derived from the JSON schema using multiprocessing.
 
     Args:
         mapping_script (str): Path to the mapping script to execute.
         mapping_function (str): Name of the mapping function to call.
-        json_schema (dict): A JSON schema defining the types and their possible values.
+        json_schema_file (str): Path to the JSON schema file defining the types and their possible values.
 
     Returns:
         dict: A dictionary with two keys:
             - 'valid': List of valid combinations with their corresponding model_id.
             - 'invalid': List of invalid combinations with errors.
     """
+    # Load JSON schema from file
+    with open(json_schema_file, "r") as schema_file:
+        json_schema = json.load(schema_file)
+
     # Extract types and values from the JSON schema
     types_and_values = extract_types_and_values(json_schema)
 
@@ -96,10 +100,9 @@ if __name__ == "__main__":
     # Example usage
     mapping_script = "mapping_modules/HAZUS_EQ/mapping_IM.py"
     mapping_function = "auto_populate"
-    # Load JSON schema from file
-    with open("mapping_modules/HAZUS_EQ/input_schema.json", "r") as schema_file:
-        json_schema = json.load(schema_file)
-    results = process_combinations(mapping_script, mapping_function, json_schema)
+    json_schema_file = "mapping_modules/HAZUS_EQ/input_schema.json"
+
+    results = process_combinations(mapping_script, mapping_function, json_schema_file)
 
     # Summary
     total_combinations = len(results['valid']) + len(results['invalid'])
