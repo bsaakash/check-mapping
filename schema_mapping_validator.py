@@ -1,9 +1,9 @@
 """
-Module: schema_mapping_validator.py
+Module: schema_mapping_validator
 
 This module facilitates validating and mapping all possible combinations of input data
-derived from a JSON schema. It uses multiprocessing to parallelize the analysis and outputs
-a summary of valid and invalid combinations.
+derived from a JSON schema. It uses multiprocessing or concurrent.futures to parallelize
+the analysis and outputs a summary of valid and invalid combinations.
 
 Key Functions:
 - run_combination: Validates and maps a single combination of input data.
@@ -12,13 +12,13 @@ generated from a given JSON schema.
 
 Features:
 - JSON schema validation using `jsonschema`.
-- Parallel processing with Python's `multiprocessing`.
+- Parallel processing with Python's `multiprocessing` or `concurrent.futures`.
 - Detailed tracking of valid and invalid combinations, including errors and tracebacks.
 - Saves results to JSON files for further analysis.
 
 Example Usage:
     Run the module as a script to process a mapping script and JSON schema:
-    python mapping_combinations.py
+    python schema_mapping_validator.py
 """
 
 from run_mapping import run_mapping
@@ -26,6 +26,7 @@ from json_schema_combinator import generate_combinations, extract_types_and_valu
 import json
 import time
 from multiprocessing import Pool
+from concurrent.futures import ProcessPoolExecutor
 import traceback
 from jsonschema import validate
 import jsonschema.exceptions
@@ -69,14 +70,17 @@ def run_combination(args):
         }
 
 
-def process_combinations(mapping_script, mapping_function, json_schema_file):
+def process_combinations(
+    mapping_script, mapping_function, json_schema_file, use_multiprocessing=True
+):
     """
-    Runs the mapping function for every combination derived from the JSON schema using multiprocessing.
+    Runs the mapping function for every combination derived from the JSON schema.
 
     Args:
         mapping_script (str): Path to the mapping script to execute.
         mapping_function (str): Name of the mapping function to call.
         json_schema_file (str): Path to the JSON schema file defining the types and their possible values.
+        use_multiprocessing (bool): Whether to use multiprocessing (True) or concurrent.futures (False).
 
     Returns:
         dict: A dictionary with two keys:
@@ -93,7 +97,7 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
     # Generate all possible combinations
     combinations = generate_combinations(types_and_values)
 
-    # Prepare multiprocessing inputs with aim_data structure
+    # Prepare inputs with aim_data structure
     inputs = [
         (
             {"GeneralInformation": combination},
@@ -106,9 +110,14 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
 
     results = {"valid": [], "invalid": []}
 
-    # Use multiprocessing Pool for parallel execution
-    with Pool() as pool:
-        outcomes = pool.map(run_combination, inputs)
+    if use_multiprocessing:
+        # Use multiprocessing Pool for parallel execution
+        with Pool() as pool:
+            outcomes = pool.map(run_combination, inputs)
+    else:
+        # Use concurrent.futures for parallel execution
+        with ProcessPoolExecutor() as executor:
+            outcomes = list(executor.map(run_combination, inputs))
 
     # Aggregate results
     for outcome in outcomes:
@@ -129,15 +138,16 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
 
 
 if __name__ == "__main__":
-    import time
-
     # Example usage
     mapping_script = "mapping_modules/HAZUS_EQ/mapping_IM.py"
     mapping_function = "auto_populate"
     json_schema_file = "mapping_modules/HAZUS_EQ/input_schema.json"
 
     start_time = time.time()
-    results = process_combinations(mapping_script, mapping_function, json_schema_file)
+    # Toggle multiprocessing or concurrent futures with use_multiprocessing
+    results = process_combinations(
+        mapping_script, mapping_function, json_schema_file, use_multiprocessing=True
+    )
     elapsed_time = time.time() - start_time
 
     # Summary
