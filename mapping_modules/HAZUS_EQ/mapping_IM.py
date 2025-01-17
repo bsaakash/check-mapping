@@ -88,6 +88,7 @@ def auto_populate(aim):
     except jsonschema.exceptions.ValidationError as exc:
         msg = ('The provided building information does not conform to the input'
                ' requirements for the chosen damage and loss model.')
+
         raise ValueError(msg) from exc
 
     # prepare the labels for model IDs
@@ -106,9 +107,10 @@ def auto_populate(aim):
         'Mid-Rise': 'M',
         'High-Rise': 'H'
     }
-    height_class = gi.get('HeightClass')
+    height_class_data = gi.get('HeightClass')
 
-    if height_class is not None:
+    if height_class_data is not None:
+        height_class = height_class_map[height_class_data]
         model_id = f'LF.{building_type}.{height_class}.{design_level}'
     else:
         model_id = f'LF.{building_type}.{design_level}'
