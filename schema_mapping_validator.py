@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     # Summary
     total_combinations = len(results["valid"]) + len(results["invalid"])
-    print("\nSummary:")
+    print("Summary:")
     print(f"Total combinations: {total_combinations}")
     print(f"Valid combinations: {len(results['valid'])}")
     print(f"Invalid combinations: {len(results['invalid'])}")
