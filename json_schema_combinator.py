@@ -1,7 +1,7 @@
 """
 json_schema_combinator
 
-This module provides functionality to extract property types and supported values from a JSON Schema 
+This module provides functionality to extract property types and supported values from a JSON Schema
 and generate all possible combinations of those property values.
 
 Key Features:
@@ -18,11 +18,11 @@ Typical Usage Example:
             "BuildingType":{
                 "type": "string",
                 "enum": [
-                    "W1", "W2", 
-                    "S1", "S2", "S3", "S4", "S5", 
-                    "C1", "C2", "C3", 
-                    "PC1", "PC2", 
-                    "RM1", "RM2", "URM", 
+                    "W1", "W2",
+                    "S1", "S2", "S3", "S4", "S5",
+                    "C1", "C2", "C3",
+                    "PC1", "PC2",
+                    "RM1", "RM2", "URM",
                     "MH"
                 ]
             },
@@ -76,7 +76,7 @@ Typical Usage Example:
 
     print(combinations)
 
-This module is useful for testing, simulation, or validation scenarios where exhaustive combinations 
+This module is useful for testing, simulation, or validation scenarios where exhaustive combinations
 of property values defined by a JSON schema are required.
 """
 
@@ -142,63 +142,78 @@ def generate_combinations(types_and_values):
     combinations = list(itertools.product(*value_lists))
     return [dict(zip(keys, combination)) for combination in combinations]
 
+
 # Example Usage
 if __name__ == "__main__":
     schema = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "BuildingType":{
+            "BuildingType": {
                 "type": "string",
                 "enum": [
-                    "W1", "W2", 
-                    "S1", "S2", "S3", "S4", "S5", 
-                    "C1", "C2", "C3", 
-                    "PC1", "PC2", 
-                    "RM1", "RM2", "URM", 
-                    "MH"
-                ]
+                    "W1",
+                    "W2",
+                    "S1",
+                    "S2",
+                    "S3",
+                    "S4",
+                    "S5",
+                    "C1",
+                    "C2",
+                    "C3",
+                    "PC1",
+                    "PC2",
+                    "RM1",
+                    "RM2",
+                    "URM",
+                    "MH",
+                ],
             },
-            "DesignLevel":{
+            "DesignLevel": {
                 "type": "string",
-                "enum": [
-                    "Pre-Code",
-                    "Low-Code",
-                    "Moderate-Code",
-                    "High-Code"
-                ]
+                "enum": ["Pre-Code", "Low-Code", "Moderate-Code", "High-Code"],
             },
-            "HeightClass":{
+            "HeightClass": {
                 "type": "string",
-                "enum": [
-                    "Low-Rise",
-                    "Mid-Rise",
-                    "High-Rise"
-                ]
+                "enum": ["Low-Rise", "Mid-Rise", "High-Rise"],
             },
-            "GroundFailure": {
-                "type": "boolean"
-            },
-            "FoundationType":{
-                "type": "string",
-                "enum": [
-                    "Shallow",
-                    "Deep"
-                ]
-            },
+            "GroundFailure": {"type": "boolean"},
+            "FoundationType": {"type": "string", "enum": ["Shallow", "Deep"]},
             "OccupancyClass": {
                 "type": "string",
                 "enum": [
-                    "RES1","RES2","RES3","RES4","RES5","RES6",
-                    "COM1","COM2","COM3","COM4","COM5","COM6","COM7","COM8","COM9","COM10",
-                    "IND1","IND2","IND3","IND4","IND5","IND6",
+                    "RES1",
+                    "RES2",
+                    "RES3",
+                    "RES4",
+                    "RES5",
+                    "RES6",
+                    "COM1",
+                    "COM2",
+                    "COM3",
+                    "COM4",
+                    "COM5",
+                    "COM6",
+                    "COM7",
+                    "COM8",
+                    "COM9",
+                    "COM10",
+                    "IND1",
+                    "IND2",
+                    "IND3",
+                    "IND4",
+                    "IND5",
+                    "IND6",
                     "AGR1",
                     "REL1",
-                    "GOV1","GOV2",
-                    "EDU1","EDU2"
-                ]
-            }
-        }
+                    "GOV1",
+                    "GOV2",
+                    "EDU1",
+                    "EDU2",
+                ],
+            },
+        },
     }
 
     types_and_values = extract_types_and_values(schema)
@@ -206,7 +221,9 @@ if __name__ == "__main__":
 
     print("Extracted Types and Values:")
     for prop, info in types_and_values.items():
-        print(f"- {prop} ({info['type']}): {len(info['values'])} values: {info['values']}")
+        print(
+            f"- {prop} ({info['type']}): {len(info['values'])} values: {info['values']}"
+        )
 
     print("\nGenerated Combinations:")
     print(f"Total combinations: {len(combinations)}")

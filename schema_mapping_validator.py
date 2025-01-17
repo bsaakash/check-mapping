@@ -30,6 +30,7 @@ import traceback
 from jsonschema import validate
 import jsonschema.exceptions
 
+
 def run_combination(args):
     """
     Helper function to run a mapping for a single combination.
@@ -37,17 +38,19 @@ def run_combination(args):
     aim_data, mapping_script, mapping_function, input_schema = args
     try:
         # Validate the provided features against the required inputs
-        gi = aim_data['GeneralInformation']
+        gi = aim_data["GeneralInformation"]
         try:
             validate(instance=gi, schema=input_schema)
         except jsonschema.exceptions.ValidationError:
-            msg = ('The provided building information does not conform to the input'
-                   ' requirements for the chosen damage and loss model.')
+            msg = (
+                "The provided building information does not conform to the input"
+                " requirements for the chosen damage and loss model."
+            )
             return {
-                'status': 'invalid',
-                'combination': gi,
-                'error': msg,
-                'traceback': traceback.format_exc()
+                "status": "invalid",
+                "combination": gi,
+                "error": msg,
+                "traceback": traceback.format_exc(),
             }
 
         # Run the mapping function with the validated aim_data
@@ -56,14 +59,15 @@ def run_combination(args):
         # Extract the model_id from the index of the comp DataFrame
         model_id = comp.index[0] if not comp.empty else None
 
-        return {'status': 'valid', 'combination': gi, 'model_id': model_id}
+        return {"status": "valid", "combination": gi, "model_id": model_id}
     except Exception as e:
         return {
-            'status': 'invalid',
-            'combination': aim_data['GeneralInformation'],
-            'error': str(e),
-            'traceback': traceback.format_exc()
+            "status": "invalid",
+            "combination": aim_data["GeneralInformation"],
+            "error": str(e),
+            "traceback": traceback.format_exc(),
         }
+
 
 def process_combinations(mapping_script, mapping_function, json_schema_file):
     """
@@ -91,14 +95,16 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
 
     # Prepare multiprocessing inputs with aim_data structure
     inputs = [
-        ({"GeneralInformation": combination}, mapping_script, mapping_function, json_schema)
+        (
+            {"GeneralInformation": combination},
+            mapping_script,
+            mapping_function,
+            json_schema,
+        )
         for combination in combinations
     ]
 
-    results = {
-        'valid': [],
-        'invalid': []
-    }
+    results = {"valid": [], "invalid": []}
 
     # Use multiprocessing Pool for parallel execution
     with Pool() as pool:
@@ -106,19 +112,21 @@ def process_combinations(mapping_script, mapping_function, json_schema_file):
 
     # Aggregate results
     for outcome in outcomes:
-        if outcome['status'] == 'valid':
-            results['valid'].append({
-                'combination': outcome['combination'],
-                'model_id': outcome['model_id']
-            })
+        if outcome["status"] == "valid":
+            results["valid"].append(
+                {"combination": outcome["combination"], "model_id": outcome["model_id"]}
+            )
         else:
-            results['invalid'].append({
-                'combination': outcome['combination'],
-                'error': outcome['error'],
-                'traceback': outcome['traceback']
-            })
+            results["invalid"].append(
+                {
+                    "combination": outcome["combination"],
+                    "error": outcome["error"],
+                    "traceback": outcome["traceback"],
+                }
+            )
 
     return results
+
 
 if __name__ == "__main__":
     import time
@@ -133,7 +141,7 @@ if __name__ == "__main__":
     elapsed_time = time.time() - start_time
 
     # Summary
-    total_combinations = len(results['valid']) + len(results['invalid'])
+    total_combinations = len(results["valid"]) + len(results["invalid"])
     print("\nSummary:")
     print(f"Total combinations: {total_combinations}")
     print(f"Valid combinations: {len(results['valid'])}")
@@ -142,6 +150,6 @@ if __name__ == "__main__":
 
     # Save results to JSON
     with open("valid_combinations.json", "w") as valid_file:
-        json.dump(results['valid'], valid_file, indent=4)
+        json.dump(results["valid"], valid_file, indent=4)
     with open("invalid_combinations.json", "w") as invalid_file:
-        json.dump(results['invalid'], invalid_file, indent=4)
+        json.dump(results["invalid"], invalid_file, indent=4)
