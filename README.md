@@ -27,7 +27,7 @@ This repository provides tools to validate mappings to fragility models. It is d
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/bsaakash/check-mapping.git
    cd check-mapping
    ```
 2. Ensure you have Python 3.x installed.
