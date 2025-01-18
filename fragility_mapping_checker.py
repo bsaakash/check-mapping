@@ -25,6 +25,7 @@ import json
 import time
 from collections import Counter
 
+
 def count_model_ids(valid_results):
     """
     Count unique model IDs and their occurrences in valid results.
@@ -35,8 +36,9 @@ def count_model_ids(valid_results):
     Returns:
         dict: Dictionary with model_id as key and its count as value.
     """
-    model_ids = [entry['model_id'] for entry in valid_results]
+    model_ids = [entry["model_id"] for entry in valid_results]
     return dict(Counter(model_ids))
+
 
 def check_fragility_mapping(valid_results, fragility_csv, output_file):
     """
@@ -60,14 +62,13 @@ def check_fragility_mapping(valid_results, fragility_csv, output_file):
     unmapped_ids = []
     with open(fragility_csv, "r") as csv_file:
         reader = csv.reader(csv_file)
-        headers = next(reader)  # Skip the header row
+        _ = next(reader)  # Skip the header row
         for row in reader:
             fragility_id = row[0]  # The fragility model ID is in the first column
             is_mapped = fragility_id in mapped_model_ids
-            fragility_status.append({
-                "fragility_model_id": fragility_id,
-                "is_mapped": is_mapped
-            })
+            fragility_status.append(
+                {"fragility_model_id": fragility_id, "is_mapped": is_mapped}
+            )
             if is_mapped:
                 mapped_ids.append(fragility_id)
             else:
@@ -87,15 +88,18 @@ def check_fragility_mapping(valid_results, fragility_csv, output_file):
         "mapped": mapped_count,
         "unmapped": unmapped_count,
         "mapped_ids": mapped_ids,
-        "unmapped_ids": unmapped_ids
+        "unmapped_ids": unmapped_ids,
     }
+
 
 if __name__ == "__main__":
     import sys
 
     # Example usage
     if len(sys.argv) != 4:
-        print("Usage: python fragility_mapping_checker.py <valid_results.json> <fragility_database.csv> <output_file.json>")
+        print(
+            "Usage: python fragility_mapping_checker.py <valid_results.json> <fragility_database.csv> <output_file.json>"
+        )
         sys.exit(1)
 
     valid_results_file = sys.argv[1]
@@ -120,6 +124,6 @@ if __name__ == "__main__":
     print(f"Mapped fragility model IDs: {summary['mapped']}")
     print(f"Unmapped fragility model IDs: {summary['unmapped']}")
     print("\nUnmapped IDs:")
-    for unmapped_id in summary['unmapped_ids']:
+    for unmapped_id in summary["unmapped_ids"]:
         print(unmapped_id)
     print(f"\nTime elapsed: {elapsed_time:.2f} seconds")
