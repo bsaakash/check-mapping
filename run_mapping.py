@@ -1,4 +1,6 @@
 """
+run_mapping.py
+
 This module provides utilities to execute a specified mapping function on AIM data.
 
 The module contains two primary functions:
