@@ -84,7 +84,7 @@ def auto_populate(aim):
     # validate the provided features against the required inputs
     try:
         validate(instance=gi, schema=input_schema)
-    except jsonschema.exceptions.ValidationError as exc: # type: ignore
+    except jsonschema.exceptions.ValidationError as exc:  # type: ignore
         msg = (
             "The provided building information does not conform to the input"
             " requirements for the chosen damage and loss model."
