@@ -13,7 +13,7 @@ Features:
 - Processes fragility database CSV files.
 - Outputs whether each fragility model ID has been mapped to.
 - Provides a summary of mapped and unmapped fragility model IDs.
-- Saves results to a JSON file for further analysis.
+- Saves results to JSON files for further analysis.
 
 Example Usage:
     Run the module to check mapping of fragility model IDs:
@@ -26,18 +26,25 @@ import time
 from collections import Counter
 
 
-def count_model_ids(valid_results):
+def count_model_ids(valid_results, output_file):
     """
-    Count unique model IDs and their occurrences in valid results.
+    Count unique model IDs and their occurrences in valid results and save to file.
 
     Args:
         valid_results (list): List of valid combinations with their model IDs.
+        output_file (str): Path to save the model ID counts as a JSON file.
 
     Returns:
         dict: Dictionary with model_id as key and its count as value.
     """
     model_ids = [entry["model_id"] for entry in valid_results]
-    return dict(Counter(model_ids))
+    model_id_counts = dict(Counter(model_ids))
+
+    # Save model_id_counts to file
+    with open(output_file, "w") as json_file:
+        json.dump(model_id_counts, json_file, indent=4)
+
+    return model_id_counts
 
 
 def check_fragility_mapping(valid_results, fragility_csv, output_file):
@@ -53,7 +60,7 @@ def check_fragility_mapping(valid_results, fragility_csv, output_file):
         dict: Summary of mapped and unmapped fragility model IDs, along with the list of unmapped IDs.
     """
     # Extract model IDs from valid results
-    model_id_counts = count_model_ids(valid_results)
+    model_id_counts = count_model_ids(valid_results, "model_id_counts.json")
     mapped_model_ids = set(model_id_counts.keys())
 
     # Process the fragility CSV file
