@@ -47,27 +47,41 @@ def run_combination(args):
                 "The provided building information does not conform to the input"
                 " requirements for the chosen damage and loss model."
             )
-            return {
-                "status": "invalid",
-                "combination": gi,
-                "error": msg,
-                "traceback": traceback.format_exc(),
-            }
+            return [
+                {
+                    "status": "invalid",
+                    "combination": gi,
+                    "model_id": None,
+                    "error": msg,
+                    "traceback": traceback.format_exc(),
+                }
+            ]
 
         # Run the mapping function with the validated aim_data
         comp = run_mapping(aim_data, mapping_script, mapping_function)
 
-        # Extract the model_id from the index of the comp DataFrame
-        model_id = comp.index[0] if not comp.empty else None
-
-        return {"status": "valid", "combination": gi, "model_id": model_id}
+        # Prepare a result for each component in the comp DataFrame
+        results = []
+        for model_id in comp.index:
+            results.append(
+                {
+                    "status": "valid",
+                    "combination": gi,
+                    "model_id": model_id,
+                }
+            )
+        return results
     except Exception as e:
-        return {
-            "status": "invalid",
-            "combination": aim_data["GeneralInformation"],
-            "error": str(e),
-            "traceback": traceback.format_exc(),
-        }
+        return [
+            {
+                "status": "invalid",
+                "combination": aim_data["GeneralInformation"],
+                "model_id": None,
+                "error": str(e),
+                "traceback": traceback.format_exc(),
+            }
+        ]
+
 
 
 def process_combinations(
@@ -121,18 +135,23 @@ def process_combinations(
 
     # Aggregate results
     for outcome in outcomes:
-        if outcome["status"] == "valid":
-            results["valid"].append(
-                {"combination": outcome["combination"], "model_id": outcome["model_id"]}
-            )
-        else:
-            results["invalid"].append(
-                {
-                    "combination": outcome["combination"],
-                    "error": outcome["error"],
-                    "traceback": outcome["traceback"],
-                }
-            )
+        for entry in outcome:  # Each `run_combination` now returns a list of dictionaries
+            if entry["status"] == "valid":
+                results["valid"].append(
+                    {
+                        "combination": entry["combination"],
+                        "model_id": entry["model_id"],
+                    }
+                )
+            else:
+                results["invalid"].append(
+                    {
+                        "combination": entry["combination"],
+                        "model_id": entry["model_id"],
+                        "error": entry["error"],
+                        "traceback": entry["traceback"],
+                    }
+                )
 
     return results
 
