@@ -513,18 +513,18 @@
     },
     {
         "fragility_model_id": "GF.H.S",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "GF.H.D",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "GF.V.S",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "GF.V.D",
-        "is_mapped": false
+        "is_mapped": true
     }
 ]
