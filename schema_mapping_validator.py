@@ -73,7 +73,6 @@ def run_combination(args):
         }
 
 
-
 def process_combinations(
     mapping_script, mapping_function, json_schema_file, use_multiprocessing=True
 ):
@@ -129,7 +128,9 @@ def process_combinations(
             results["valid"].append(
                 {
                     "combination": outcome["combination"],
-                    "model_ids": outcome["model_ids"],  # Updated to include all model_ids
+                    "model_ids": outcome[
+                        "model_ids"
+                    ],  # Updated to include all model_ids
                 }
             )
         else:
@@ -140,7 +141,6 @@ def process_combinations(
                     "traceback": outcome["traceback"],
                 }
             )
-
 
     return results
 
