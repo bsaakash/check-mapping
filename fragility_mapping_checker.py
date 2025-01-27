@@ -39,9 +39,10 @@ def count_model_ids(valid_results, output_file):
     model_ids = [model_id for entry in valid_results for model_id in entry["model_ids"]]
     model_id_counts = dict(Counter(model_ids))
 
-    # Save model_id_counts to file
-    with open(output_file, "w") as json_file:
-        json.dump(model_id_counts, json_file, indent=4)
+    if output_file is not None:
+        # Save model_id_counts to file
+        with open(output_file, "w") as json_file:
+            json.dump(model_id_counts, json_file, indent=4)
 
     return model_id_counts
 
@@ -58,7 +59,7 @@ def check_fragility_mapping(valid_results, fragility_csv, output_file):
         dict: Summary of mapped and unmapped fragility model IDs, along with the list of unmapped IDs.
     """
     # Extract model IDs from valid results
-    model_id_counts = count_model_ids(valid_results, "model_id_counts.json")
+    model_id_counts = count_model_ids(valid_results, None)
     mapped_model_ids = set(model_id_counts.keys())
 
     # Process the fragility CSV file
