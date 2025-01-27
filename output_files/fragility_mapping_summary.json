@@ -1,35 +1,35 @@
 [
     {
         "fragility_model_id": "LF.W1.HC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W1.MC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W1.LC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W1.PC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W2.HC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W2.MC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W2.LC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.W2.PC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.S1.L.HC",
@@ -129,19 +129,19 @@
     },
     {
         "fragility_model_id": "LF.S3.HC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.S3.MC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.S3.LC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.S3.PC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.S4.L.HC",
@@ -337,19 +337,19 @@
     },
     {
         "fragility_model_id": "LF.PC1.HC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.PC1.MC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.PC1.LC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.PC1.PC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.PC2.L.HC",
@@ -497,19 +497,19 @@
     },
     {
         "fragility_model_id": "LF.MH.HC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.MH.MC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.MH.LC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "LF.MH.PC",
-        "is_mapped": false
+        "is_mapped": true
     },
     {
         "fragility_model_id": "GF.H.S",
