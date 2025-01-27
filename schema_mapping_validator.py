@@ -51,7 +51,6 @@ This module is ideal for use cases such as automated testing, input validation, 
 where exhaustive combinations of input data need to be validated and processed.
 """
 
-
 from run_mapping import run_mapping
 from json_schema_combinator import generate_combinations, extract_types_and_values
 import json
@@ -103,7 +102,9 @@ def run_combination(args):
         }
 
 
-def process_combinations(mapping_script, mapping_function, json_schema_file, parallel=True):
+def process_combinations(
+    mapping_script, mapping_function, json_schema_file, parallel=True
+):
     """
     Runs the mapping function for every combination derived from the JSON schema.
 

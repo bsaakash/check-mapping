@@ -147,9 +147,7 @@ def run_from_command_line():
         print("Component Assignment:")
         print(comp)
     except (FileNotFoundError, ImportError, ValueError) as e:
-        raise RuntimeError(
-            f"An error occurred during the mapping process:\n{e}"
-        ) from e
+        raise RuntimeError(f"An error occurred during the mapping process:\n{e}") from e
 
 
 if __name__ == "__main__":

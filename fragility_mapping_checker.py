@@ -25,6 +25,7 @@ import json
 import time
 from collections import Counter
 
+
 def count_model_ids(valid_results, output_file):
     """
     Count unique model IDs and their occurrences in valid results and save to file.
@@ -45,6 +46,7 @@ def count_model_ids(valid_results, output_file):
             json.dump(model_id_counts, json_file, indent=4)
 
     return model_id_counts
+
 
 def check_fragility_mapping(valid_results, fragility_csv, output_file):
     """
@@ -96,6 +98,7 @@ def check_fragility_mapping(valid_results, fragility_csv, output_file):
         "mapped_ids": mapped_ids,
         "unmapped_ids": unmapped_ids,
     }
+
 
 if __name__ == "__main__":
     import sys
