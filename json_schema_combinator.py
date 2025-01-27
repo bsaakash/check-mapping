@@ -1,13 +1,17 @@
 """
 json_schema_combinator
 
-This module provides functionality to extract property types and supported values from a JSON Schema
-and generate all possible combinations of those property values.
+This module provides functionality to parse a JSON Schema and generate all valid combinations
+of property values based on the schema's constraints. It ensures that required properties are
+always included in every combination while optional properties can be included or excluded,
+representing both their presence and absence in the combinations.
 
 Key Features:
-- Parse a JSON Schema to extract the types and constraints for each property.
-- Support various JSON Schema constraints such as `enum`, `minimum`, `maximum`, and `type`.
-- Generate all combinations of property values using Cartesian product.
+- Extract property types and supported values from a JSON Schema, including handling `enum`, `type`,
+  and required fields.
+- Generate combinations of property values using Cartesian product, ensuring required properties
+  are always included and optional properties can be excluded (represented as None).
+- Filter combinations to ensure validity with respect to the schema.
 
 Typical Usage Example:
     # Load a JSON schema
@@ -15,69 +19,43 @@ Typical Usage Example:
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "BuildingType":{
+            "BuildingType": {
                 "type": "string",
-                "enum": [
-                    "W1", "W2",
-                    "S1", "S2", "S3", "S4", "S5",
-                    "C1", "C2", "C3",
-                    "PC1", "PC2",
-                    "RM1", "RM2", "URM",
-                    "MH"
-                ]
+                "enum": ["W1", "W2", "S1", "S2", "S3"]
             },
-            "DesignLevel":{
+            "DesignLevel": {
                 "type": "string",
-                "enum": [
-                    "Pre-Code",
-                    "Low-Code",
-                    "Moderate-Code",
-                    "High-Code"
-                ]
+                "enum": ["Pre-Code", "Low-Code"]
             },
-            "HeightClass":{
+            "HeightClass": {
                 "type": "string",
-                "enum": [
-                    "Low-Rise",
-                    "Mid-Rise",
-                    "High-Rise"
-                ]
+                "enum": ["Low-Rise", "Mid-Rise"]
             },
-            "GroundFailure": {
-                "type": "boolean"
-            },
-            "FoundationType":{
-                "type": "string",
-                "enum": [
-                    "Shallow",
-                    "Deep"
-                ]
-            },
-            "OccupancyClass": {
-                "type": "string",
-                "enum": [
-                    "RES1","RES2","RES3","RES4","RES5","RES6",
-                    "COM1","COM2","COM3","COM4","COM5","COM6","COM7","COM8","COM9","COM10",
-                    "IND1","IND2","IND3","IND4","IND5","IND6",
-                    "AGR1",
-                    "REL1",
-                    "GOV1","GOV2",
-                    "EDU1","EDU2"
-                ]
-            }
-        }
+            "GroundFailure": {"type": "boolean"}
+        },
+        "required": ["BuildingType", "DesignLevel"]
     }
 
-    # Extract types and values
-    types_and_values = extract_types_and_values(schema)
+    # Extract property types and values
+    types_and_values, required = extract_types_and_values(schema)
 
-    # Generate all combinations
-    combinations = generate_combinations(types_and_values)
+    # Generate all valid combinations of property values
+    combinations = generate_combinations(types_and_values, required)
 
+    # Example output
     print(combinations)
 
-This module is useful for testing, simulation, or validation scenarios where exhaustive combinations
-of property values defined by a JSON schema are required.
+Module Functions:
+- extract_types_and_values(schema):
+    Parses the JSON schema and extracts a dictionary of property names, their types, and supported values.
+    Also identifies required properties.
+
+- generate_combinations(types_and_values, required):
+    Generates all valid combinations of property values, ensuring required properties are always present,
+    and optional properties can be excluded.
+
+This module is ideal for scenarios such as testing, simulation, or validation where exhaustive combinations
+of property values defined by a JSON schema are needed.
 """
 
 import itertools
@@ -91,10 +69,12 @@ def extract_types_and_values(schema):
         schema (dict): The JSON schema dictionary.
 
     Returns:
-        dict: A dictionary with property names as keys and their types and supported values as values.
+        tuple: A dictionary with property names as keys and their types and supported values as values,
+               and a set of required properties.
     """
     types_and_values = {}
     properties = schema.get("properties", {})
+    required = set(schema.get("required", []))
 
     for prop, details in properties.items():
         prop_type = details.get("type", "unknown")
@@ -102,45 +82,52 @@ def extract_types_and_values(schema):
 
         if "enum" in details:  # For enumerated values
             values = details["enum"]
-        # elif prop_type == "number" or prop_type == "integer":
-        #     if "minimum" in details and "maximum" in details:
-        #         # Generate a range of values (example: step of 1 for simplicity)
-        #         values = list(range(details["minimum"], details["maximum"] + 1))
-        #     elif "minimum" in details:
-        #         values = [details["minimum"]]
-        #     elif "maximum" in details:
-        #         values = [details["maximum"]]
-        elif prop_type == "string":
-            if "enum" in details:
-                values = details["enum"]
-            else:
-                values = ["example_string"]
         elif prop_type == "boolean":
             values = [True, False]
-
-        # Fallback for unsupported types or missing constraints
-        if not values:
+        elif prop_type == "string":
+            values = ["example_string"]
+        else:
             values = [f"default_{prop_type}"]
+
+        # Optional properties can also have a "None" value to signify exclusion
+        if prop not in required:
+            values = [None] + values
 
         types_and_values[prop] = {"type": prop_type, "values": values}
 
-    return types_and_values
+    return types_and_values, required
 
 
-def generate_combinations(types_and_values):
+def generate_combinations(types_and_values, required):
     """
     Generate all combinations of the values of the properties.
 
     Args:
         types_and_values (dict): A dictionary containing types and values of properties.
+        required (set): A set of required property names.
 
     Returns:
         list: A list of dictionaries, each representing a unique combination of property values.
     """
     keys = types_and_values.keys()
     value_lists = [types_and_values[key]["values"] for key in keys]
-    combinations = list(itertools.product(*value_lists))
-    return [dict(zip(keys, combination)) for combination in combinations]
+
+    # Generate all possible combinations
+    all_combinations = list(itertools.product(*value_lists))
+
+    # Filter combinations to ensure required properties are present
+    valid_combinations = []
+    for combination in all_combinations:
+        combo_dict = dict(zip(keys, combination))
+
+        # Ensure all required properties are present and not None
+        if all(combo_dict[key] is not None for key in required):
+            # Remove optional properties that are None
+            valid_combinations.append(
+                {k: v for k, v in combo_dict.items() if v is not None}
+            )
+
+    return valid_combinations
 
 
 # Example Usage
@@ -214,10 +201,11 @@ if __name__ == "__main__":
                 ],
             },
         },
+        "required": ["BuildingType", "DesignLevel"],
     }
 
-    types_and_values = extract_types_and_values(schema)
-    combinations = generate_combinations(types_and_values)
+    types_and_values, required = extract_types_and_values(schema)
+    combinations = generate_combinations(types_and_values, required)
 
     print("Extracted Types and Values:")
     for prop, info in types_and_values.items():
