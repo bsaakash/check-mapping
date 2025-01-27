@@ -95,10 +95,10 @@ def process_combinations(
         json_schema = json.load(schema_file)
 
     # Extract types and values from the JSON schema
-    types_and_values = extract_types_and_values(json_schema)
+    types_and_values, required = extract_types_and_values(json_schema)
 
     # Generate all possible combinations
-    combinations = generate_combinations(types_and_values)
+    combinations = generate_combinations(types_and_values, required)
 
     # Prepare inputs with aim_data structure
     inputs = [
