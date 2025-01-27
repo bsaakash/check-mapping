@@ -1,32 +1,62 @@
 """
 Module: schema_mapping_validator
 
-This module facilitates validating and mapping all possible combinations of input data
-derived from a JSON schema. It uses multiprocessing or concurrent.futures to parallelize
-the analysis and outputs a summary of valid and invalid combinations.
+This module facilitates the validation and mapping of all possible combinations of input data
+derived from a JSON schema. It uses Python's `multiprocessing` module to parallelize the analysis
+by default, with an option to execute in series for debugging or smaller datasets.
+
+Key Features:
+- **JSON Schema Validation**:
+    - Validates input data combinations against a JSON schema using the `jsonschema` library.
+- **Mapping Function Execution**:
+    - Executes a user-specified mapping function to process valid combinations.
+- **Parallel or Series Execution**:
+    - Runs the validation and mapping in parallel using `multiprocessing` for efficiency.
+    - Provides an option to execute in series for easier debugging or when parallelization is unnecessary.
+- **Error Tracking**:
+    - Captures detailed error messages and tracebacks for invalid combinations.
+- **Result Storage**:
+    - Outputs valid and invalid combinations as JSON files for further analysis.
 
 Key Functions:
-- run_combination: Validates and maps a single combination of input data.
-- process_combinations: Orchestrates the validation and mapping for all combinations
-generated from a given JSON schema.
-
-Features:
-- JSON schema validation using `jsonschema`.
-- Parallel processing with Python's `multiprocessing` or `concurrent.futures`.
-- Detailed tracking of valid and invalid combinations, including errors and tracebacks.
-- Saves results to JSON files for further analysis.
+- `run_combination`:
+    Validates and processes a single combination of input data.
+- `process_combinations`:
+    Orchestrates the validation and mapping for all combinations generated from a given JSON schema.
+    Supports parallel or series execution.
+- `main`:
+    Command-line entry point to process a mapping script and JSON schema.
 
 Example Usage:
-    Run the module as a script to process a mapping script and JSON schema:
+    Run the module as a script to validate and map all possible combinations:
+
     python schema_mapping_validator.py
+
+    Example arguments (within the script):
+    - `mapping_script`: Path to the Python script containing the mapping function.
+    - `mapping_function`: Name of the mapping function to call.
+    - `json_schema_file`: Path to the JSON schema file defining input combinations.
+
+Outputs:
+- `valid_combinations.json`: Contains all valid combinations along with the extracted model IDs.
+- `invalid_combinations.json`: Contains all invalid combinations with detailed error messages and tracebacks.
+
+Dependencies:
+- `multiprocessing`: For parallel execution.
+- `jsonschema`: For schema validation.
+- `run_mapping`: User-defined module to execute mapping functions.
+- `json_schema_combinator`: Generates all possible combinations from the JSON schema.
+
+This module is ideal for use cases such as automated testing, input validation, and scenario analysis
+where exhaustive combinations of input data need to be validated and processed.
 """
+
 
 from run_mapping import run_mapping
 from json_schema_combinator import generate_combinations, extract_types_and_values
 import json
 import time
 from multiprocessing import Pool
-from concurrent.futures import ProcessPoolExecutor
 import traceback
 from jsonschema import validate
 import jsonschema.exceptions
@@ -73,9 +103,7 @@ def run_combination(args):
         }
 
 
-def process_combinations(
-    mapping_script, mapping_function, json_schema_file, use_multiprocessing=True
-):
+def process_combinations(mapping_script, mapping_function, json_schema_file, parallel=True):
     """
     Runs the mapping function for every combination derived from the JSON schema.
 
@@ -83,7 +111,7 @@ def process_combinations(
         mapping_script (str): Path to the mapping script to execute.
         mapping_function (str): Name of the mapping function to call.
         json_schema_file (str): Path to the JSON schema file defining the types and their possible values.
-        use_multiprocessing (bool): Whether to use multiprocessing (True) or concurrent.futures (False).
+        parallel (bool): Whether to use multiprocessing (True) or run in series (False).
 
     Returns:
         dict: A dictionary with two keys:
@@ -113,14 +141,13 @@ def process_combinations(
 
     results = {"valid": [], "invalid": []}
 
-    if use_multiprocessing:
+    if parallel:
         # Use multiprocessing Pool for parallel execution
         with Pool() as pool:
             outcomes = pool.map(run_combination, inputs)
     else:
-        # Use concurrent.futures for parallel execution
-        with ProcessPoolExecutor() as executor:
-            outcomes = list(executor.map(run_combination, inputs))
+        # Run in series
+        outcomes = [run_combination(args) for args in inputs]
 
     # Aggregate results
     for outcome in outcomes:
@@ -128,9 +155,7 @@ def process_combinations(
             results["valid"].append(
                 {
                     "combination": outcome["combination"],
-                    "model_ids": outcome[
-                        "model_ids"
-                    ],  # Updated to include all model_ids
+                    "model_ids": outcome["model_ids"],
                 }
             )
         else:
@@ -152,9 +177,9 @@ if __name__ == "__main__":
     json_schema_file = "mapping_modules/HAZUS_EQ/input_schema.json"
 
     start_time = time.time()
-    # Toggle multiprocessing or concurrent futures with use_multiprocessing
+    # Toggle between parallel and series execution with the `parallel` argument
     results = process_combinations(
-        mapping_script, mapping_function, json_schema_file, use_multiprocessing=True
+        mapping_script, mapping_function, json_schema_file, parallel=True
     )
     elapsed_time = time.time() - start_time
 
